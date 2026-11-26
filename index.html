@@ -235,6 +235,15 @@ button:not(:disabled):active {transform:translateY(1px);}
   .fit-preview {height:190px;}
 }
 @media(prefers-reduced-motion:reduce){button:not(:disabled):active{transform:none;}}
+.closet-options {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;}
+.closet-options button {display:grid;align-content:start;justify-items:center;gap:3px;padding:3px 3px 5px;line-height:1.12;overflow:hidden;}
+.closet-options canvas {width:100%;height:38px;object-fit:contain;touch-action:auto;pointer-events:none;border-radius:5px;background:radial-gradient(at 45% 30%,#faf8e8,#e9e7d9);}
+.closet-options button span {font-size:11px;min-height:1.15em;}
+.closet-options button[aria-pressed=true] canvas {background:radial-gradient(at 40% 30%,#f0f3dd,#d2dfcb);}
+#game nav,#catalog .item,.studio-tabs {
+  background-image:linear-gradient(145deg,#fcfcf3ed,#e6ecdeeb),var(--paper-grain);
+  background-size:auto,100px;
+}
 </style></head><body><main id="landing"><div class="intro studio"><div class="studio-brand"><div class="eyebrow">Bedford-Stuyvesant · Brooklyn</div><h1>Little Lives<span>.</span></h1><div class="edition">New York</div></div><figure class="portrait-stage"><canvas id="studioPortrait" width="420" height="420" role="img" aria-label="Live character appearance preview"></canvas><figcaption><button id="previousHair" aria-label="Previous hairstyle">‹</button><span id="currentStyle">Short waves</span><button id="nextHair" aria-label="Next hairstyle">›</button></figcaption></figure></div><section class="joincard" id="entryCard"><h2 id="entryTitle">Create your resident.</h2><label>Your character name<input id="name" maxlength="20" placeholder="Your name"></label><div id="landingAppearance" class="appearance"></div><label id="apartmentNameLabel">Apartment name<input id="world" maxlength="35" value="The Bed-Stuy walk-up"></label><button id="continueSolo" hidden>Continue local apartment</button><button id="solo" class="primary">Start a local apartment</button><button id="create">Create private world</button><div class="or" id="joinDivider">Join a roommate</div><label id="inviteCodeLabel">Invite code<input id="code" maxlength="512" spellcheck="false" placeholder="Paste a roommate invite" autocapitalize="characters"></label><button id="join">Join apartment</button><details><summary>Restore an existing character</summary><label>Recovery key<input id="recover" placeholder="Paste recovery key"></label><button id="restore">Restore character</button></details><button id="otherApartment" hidden>Choose another apartment</button><p id="loginError" class="error" role="alert"></p></section></main><main id="game" hidden><header><div><span class="brand">Little Lives<span>.</span></span><span id="worldName" class="worldname"></span></div><div class="topright"><span class="money" id="money">$ 0</span><button id="invite">Invite</button><button id="leave" title="Return to title screen">Exit</button></div></header><div class="gamebody"><section class="scene"><canvas id="canvas" aria-label="Isometric interactive house"></canvas><div class="scenehead"><span id="connection">● Connecting</span><span id="activity"></span><span id="clock"></span></div><div class="station-sign"><small id="placeBorough">Brooklyn</small><strong id="placeTitle">Bed-Stuy walk-up</strong><button id="sceneTransit">↗ Catch the subway</button></div><div class="zoom"><button id="zoomOut" aria-label="Zoom out">−</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="resetView" aria-label="Fit world">Fit</button></div><div id="toast" role="status"></div><div id="objectHint"></div></section><aside><nav><button data-mode="live" class="active">◉ Live</button><button data-mode="city">City</button><button data-mode="build">⌂ Build</button><button data-mode="pets" hidden>Pets</button><button data-mode="life">✦ Life</button><button data-mode="chat">☏ Chat</button></nav><div id="livePanel" class="panel"><div class="paneltitle"><canvas id="residentPortrait" width="96" height="96" aria-label="Your resident portrait"></canvas><h2 id="playerName">Character</h2><span>RESIDENT</span></div><div id="needs"></div><button id="work" class="primary">Design gig · Earn $100</button><button id="openWardrobe" class="wardrobe-link">Open wardrobe</button><h3>Roommates</h3><div id="household"></div><p class="help">Tap a floor tile to walk. Tap furniture to use it. Tap a friend to socialize.</p></div><div id="cityPanel" class="panel" hidden><div class="paneltitle"><h2>Subway board</h2></div><p id="passport"></p><button class="primary" id="rideHome" hidden>Return to Bed-Stuy · Free</button><div id="cityPetWalk"></div><div id="stopList"></div></div><div id="buildPanel" class="panel" hidden><div class="paneltitle"><h2>Build & buy</h2><span>SHARED HOME</span></div><div class="tools"><button data-tool="buy" class="active">Buy</button><button data-tool="paint">Floor</button><button data-tool="sell">Sell</button><button data-tool="rotate">Rotate</button><button data-tool="move">Move</button><button data-tool="wall">Walls</button></div><div id="buildColors" class="swatches"></div><p id="finishName" hidden></p><div id="wallControls" hidden><label>Edge direction <select id="wallSide"><option value="E">Right edge (east)</option><option value="S">Left edge (south)</option></select></label><select id="wallType"><option value="wall">Wall · $12</option><option value="door">Door · $25</option><option value="remove">Remove edge</option></select><button id="wallsView">Toggle wall height</button></div><label id="catalogFilterLabel">Browse furniture<select id="catalogFilter"><option value="all">All furniture</option><option value="living">Living &amp; sleeping</option><option value="kitchen">Kitchen &amp; bath</option><option value="studio">Work &amp; hobbies</option><option value="garden">Decor &amp; garden</option><option value="pets">Pet habitats</option></select></label><div id="catalog"></div><p id="buildHelp" class="help"></p></div><section id="petsPanel" class="panel" hidden><div class="paneltitle"><h2>Apartment pets</h2><span id="petCount"></span></div><div id="companions"></div><details id="adoptionDesk" open><summary>Adopt a pet</summary><div id="petChoices" class="pet-choices" aria-label="Choose a species"></div><div id="adoptionNote" class="adoption-note"></div><label>Pet name<input id="petName" maxlength="20" placeholder="Choose a name" autocomplete="off"></label><label>Habitat<select id="petHabitat"></select></label><button id="adoptPet" class="primary">Adopt</button></details><p id="petFeedback" role="status"></p></section><div id="lifePanel" class="panel" hidden><div class="paneltitle"><h2>My little life</h2><span>PROGRESS</span></div><label>Career<select id="career"><option value="freelance">Brooklyn designer</option><option value="chef">Line cook</option><option value="artist">Studio artist</option><option value="trainer">Boxing coach</option><option value="gardener">Rooftop grower</option></select></label><div id="careerProgress" class="career-card" hidden></div><button id="shift" class="primary">Go to work · 12 sec</button><h3>Skills</h3><div id="skills"></div><h3>Relationships</h3><div id="relationships"></div><h3 id="styleTitle">Dressing room</h3><div id="editAppearance" class="appearance"></div><button id="applyAppearance">Save appearance</button><h3>Household milestones</h3><div id="goals"></div><h3>Memory journal</h3><div id="journal"></div></div><div id="chatPanel" class="panel" hidden><div class="paneltitle"><h2>Apartment chat</h2><span>PRIVATE</span></div><div id="messages"></div><form id="chatForm"><input id="message" maxlength="220" placeholder="Say something…" autocomplete="off"><button class="primary">Send</button></form></div></aside></div></main><dialog id="inviteDialog"><h2>Make room for a friend.</h2><p>Open this game on another device and enter your private world code.</p><div id="inviteCode" class="invitecode"></div><label id="inviteLinkLabel" hidden>Invite link<input id="inviteUrl" readonly></label><button id="copyInviteLink" class="primary" hidden>Copy invite link</button><button id="copyInvite">Copy invite code</button><p class="help" id="inviteHelp"></p><details><summary>My character recovery key</summary><input id="recoveryKey" readonly><button id="copyRecovery">Copy recovery key</button></details><button id="closeInvite">Close</button></dialog><dialog id="doorDialog" aria-labelledby="doorTitle"><div class="door-top"><div class="door-key" aria-hidden="true">⚿</div><button id="closeDoorDialog" aria-label="Close invite dialog">×</button></div><h2 id="doorTitle">Invite a roommate</h2><p>Keep this game open while your friend visits. Your apartment and both characters save on this device.</p><p id="doorStatus" role="status"></p><div id="doorReady" hidden><label>Guest link<input id="guestUrl" readonly type="url" spellcheck="false"></label><button id="shareDoor" class="primary" hidden>Share invite link</button><button id="copyDoorLink">Copy invite link</button><details id="doorOptions"><summary>Other ways to invite</summary><label>Roommate invite<input id="roomCode" readonly></label><button id="copyDoor">Copy invite code</button><button id="guestFile" hidden>Save guest game with invite</button></details><p class="help" id="doorHint"></p></div><button id="retryDoor" hidden>Try opening again</button><button id="endDoor" hidden>End hosting</button></dialog><dialog id="socialDialog"><h2 id="socialTitle">Spend time together</h2><button data-social="chat">Chat together</button><button data-social="compliment">Give a compliment</button><button data-social="hug">Give a hug</button><button data-social="outing" id="outing" hidden>Explore together · +14 friendship</button><button id="closeSocial">Cancel</button></dialog><script>/*! PeerJS 1.5.5 | MIT
 Copyright (c) 2015 Michelle Bu and Eric Zhang, http://peerjs.com
 
@@ -591,7 +600,16 @@ const WardrobeArt=(()=>{
     }
     g.drawImage(sprite,-58,-9);
   }
-  return {resident,stage,headwear};
+  const detailCrops={hat:[-38,-5,76,43],top:[-41,48,82,81],bottom:[-36,125,72,78],shoes:[-26,189,52,30],glasses:[-20,16,40,23],bag:[-44,58,88,80]};
+  function detail(canvas,a,color,slot,index){
+    const [x,y,w,h]=detailCrops[slot],g=canvas.getContext('2d');
+    g.clearRect(0,0,canvas.width,canvas.height);g.save();
+    const scale=Math.min((canvas.width-6)/w,(canvas.height-4)/h);
+    g.translate(canvas.width*.5,canvas.height*.5);g.scale(scale,scale);g.translate(-x-w*.5,-y-h*.5);
+    g.beginPath();g.rect(x,y,w,h);g.clip();
+    figure(g,{...a,[slot]:index},color);g.restore();
+  }
+  return {resident,stage,headwear,detail};
 })();
 </script><script>'use strict';
 const ResidentStudio=(()=>{
@@ -670,6 +688,9 @@ const ResidentStudio=(()=>{
       if(preview)WardrobeArt.stage(preview,view.obj,view.obj.color||0);
       else if(view.editing)portrait(root.querySelector('.edit-portrait'),view.obj,view.obj.color||0);
     }
+    for(const [root,view] of views){
+      for(const tile of root.querySelectorAll('canvas[data-garment]'))WardrobeArt.detail(tile,view.obj,view.obj.color||0,view.slot,Number(tile.dataset.garment));
+    }
     for(const tile of document.querySelectorAll('canvas[data-style]')){
       const editor=tile.closest('#editAppearance')?editLook:look;
       portrait(tile,{...editor,hair:Number(tile.dataset.style)},editor.color||0);
@@ -717,13 +738,15 @@ const ResidentStudio=(()=>{
       body.append(switcher(categories,slot,value=>{view.slot=value;renderEditor(root);},'closet-slots','Clothing category'));
       const list=el('fieldset'),title=el('legend',categories[slot]),options=el('div',undefined,'closet-options');
       Wardrobe.slots[slot].forEach((name,i)=>{
-        const b=el('button',name);b.type='button';b.setAttribute('aria-pressed',String((obj[slot]||0)===i));
+        const b=el('button');b.type='button';b.setAttribute('aria-pressed',String((obj[slot]||0)===i));
+        const tile=el('canvas');tile.width=112;tile.height=66;tile.dataset.garment=i;tile.setAttribute('aria-hidden','true');
+        b.append(tile,el('span',name));
         b.onclick=()=>{obj[slot]=i;for(const [j,button] of [...options.children].entries())button.setAttribute('aria-pressed',String(j===i));refresh();};
         options.append(b);
       });
       list.append(title,options);body.append(list);
       const key=colorsFor[slot];
-      if(key){obj[key]??=Wardrobe.colorDefaults[key]??0;group(body,slot==='top'?'Top color':categories[slot]+' color',slot==='top'?outfitNames:Wardrobe.dyeNames,slot==='top'?outfits:Wardrobe.dyes,obj,key);}
+      if(key){obj[key]??=Wardrobe.colorDefaults[key]??0;group(body,{hat:'Hat color',top:'Top color',bottom:'Fabric color',shoes:'Shoe color',bag:'Bag color'}[slot],slot==='top'?outfitNames:Wardrobe.dyeNames,slot==='top'?outfits:Wardrobe.dyes,obj,key);}
     }
     refresh();
   }
@@ -741,6 +764,7 @@ const urls={"oak":"data:image/webp;base64,UklGRmAvAABXRUJQVlA4IFQvAADQ6gCdASpAAU
     ['Honey oak','oak'],['Smoked oak','oak'],['Sage terrazzo','terrazzo'],['Sandstone','plaster'],
     ['Harbor terrazzo','terrazzo'],['Rose terrazzo','terrazzo'],['Olive concrete','plaster'],['Ivory terrazzo','terrazzo']
   ];
+  document.documentElement.style.setProperty('--paper-grain','url('+urls.plaster+')');
   let revision=0;
   for(const [key,url] of Object.entries(urls)){
     const tile=new Image();tile.onload=()=>{tiles[key]=tile;revision++;};tile.src=url;
