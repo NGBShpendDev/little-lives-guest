@@ -267,6 +267,8 @@ button:not(:disabled):active {transform:translateY(1px);}
 .zoom button{font-size:18px;padding:0 6px}.zoom #resetView{font-size:12px}
 .fit-preview,.edit-portrait,#studioPortrait{background:radial-gradient(ellipse at 47% 32%,#d0e4dc,#a3c8ca)}
 @media(max-width:600px){.zoom button{min-width:32px;min-height:32px}.zoom{gap:1px}}
+
+.appearance .feature-select{width:auto;display:flex!important;flex-direction:column;gap:4px;margin:3px 0!important;align-items:stretch}.appearance .feature-select select{min-width:76px;font:inherit;padding:7px}.feature-group{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;grid-column:1/-1;width:100%}
 </style></head><body><main id="landing"><div class="intro studio"><div class="studio-brand"><div class="eyebrow">Bedford-Stuyvesant · Brooklyn</div><h1>Little Lives<span>.</span></h1><div class="edition">New York</div></div><figure class="portrait-stage"><canvas id="studioPortrait" width="420" height="420" role="img" aria-label="Live character appearance preview"></canvas><figcaption><button id="previousHair" aria-label="Previous hairstyle">‹</button><span id="currentStyle">Short waves</span><button id="nextHair" aria-label="Next hairstyle">›</button></figcaption></figure></div><section class="joincard" id="entryCard"><h2 id="entryTitle">Create your resident.</h2><label>Your character name<input id="name" maxlength="20" placeholder="Your name"></label><div id="landingAppearance" class="appearance"></div><label id="apartmentNameLabel">Apartment name<input id="world" maxlength="35" value="The Bed-Stuy walk-up"></label><button id="continueSolo" hidden>Continue local apartment</button><button id="solo" class="primary">Start a local apartment</button><button id="create">Create private world</button><div class="or" id="joinDivider">Join a roommate</div><label id="inviteCodeLabel">Invite code<input id="code" maxlength="512" spellcheck="false" placeholder="Paste a roommate invite" autocapitalize="characters"></label><button id="join">Join apartment</button><details><summary>Restore an existing character</summary><label>Recovery key<input id="recover" placeholder="Paste recovery key"></label><button id="restore">Restore character</button></details><button id="otherApartment" hidden>Choose another apartment</button><p id="loginError" class="error" role="alert"></p></section></main><main id="game" hidden><header><div><span class="brand">Little Lives<span>.</span></span><span id="worldName" class="worldname"></span></div><div class="topright"><span class="money" id="money">$ 0</span><button id="invite">Invite</button><button id="leave" title="Return to title screen">Exit</button></div></header><div id="familyNotice" role="status" hidden></div><div class="gamebody"><section class="scene"><canvas id="canvas" aria-label="Interactive 3D neighborhood"></canvas><div class="scenehead"><span id="connection">● Connecting</span><span id="activity"></span><span id="forecast" hidden></span><span id="clock"></span></div><div class="station-sign"><small id="placeBorough">Brooklyn</small><strong id="placeTitle">Bed-Stuy walk-up</strong><button id="sceneTransit">↗ Catch the subway</button></div><div class="zoom" role="group" aria-label="Camera"><button id="orbitLeft" aria-label="Rotate camera left" title="Rotate camera left">↶</button><button id="orbitRight" aria-label="Rotate camera right" title="Rotate camera right">↷</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="resetView" aria-label="Fit world">Fit</button></div><div id="toast" role="status"></div><div id="objectHint"></div></section><aside><nav><button data-mode="live" class="active">◉ Live</button><button data-mode="city">City</button><button data-mode="build">⌂ Build</button><button data-mode="pets" hidden>Pets</button><button data-mode="life">✦ Life</button><button data-mode="chat">☏ Chat</button></nav><div id="livePanel" class="panel"><div class="paneltitle"><canvas id="residentPortrait" width="96" height="96" aria-label="Your resident portrait"></canvas><h2 id="playerName">Character</h2><span>RESIDENT</span></div><div id="soloDays" class="borough-card" hidden></div><div id="needs"></div><button id="work" class="primary">Design gig · Earn $100</button><button id="openWardrobe" class="wardrobe-link">Open wardrobe</button><div id="localLife" hidden></div><h3>Roommates</h3><div id="household"></div><p class="help">Tap a floor tile to walk. Tap furniture to use it. Tap a friend to socialize.</p></div><div id="cityPanel" class="panel" hidden><div class="paneltitle"><h2>Subway board</h2></div><div id="travelTools" hidden></div><div id="boroughShop" hidden></div><p id="passport"></p><button class="primary" id="rideHome" hidden>Return to Bed-Stuy · Free</button><div id="cityPetWalk"></div><div id="stopList"></div></div><div id="buildPanel" class="panel" hidden><div class="paneltitle"><h2>Build & buy</h2><span>SHARED HOME</span></div><details id="propertyDesk"><summary>Property &amp; finishes</summary><div id="estateTools" hidden></div></details><div class="tools"><button data-tool="buy" class="active">Buy</button><button data-tool="paint">Floor</button><button data-tool="sell">Sell</button><button data-tool="rotate">Rotate</button><button data-tool="move">Move</button><button data-tool="wall">Walls</button></div><div id="buildColors" class="swatches"></div><p id="finishName" hidden></p><div id="wallControls" hidden><label>Edge direction <select id="wallSide"><option value="E">Right edge (east)</option><option value="S">Left edge (south)</option></select></label><select id="wallType"><option value="wall">Wall · $12</option><option value="door">Door · $25</option><option value="remove">Remove edge</option></select><button id="wallsView">Toggle wall height</button></div><label id="catalogFilterLabel">Browse furniture<select id="catalogFilter"><option value="all">All furniture</option><option value="living">Living &amp; sleeping</option><option value="kitchen">Kitchen &amp; bath</option><option value="studio">Work &amp; hobbies</option><option value="garden">Decor &amp; garden</option><option value="pets">Pet habitats</option></select></label><div id="catalog"></div><p id="buildHelp" class="help"></p></div><section id="petsPanel" class="panel" hidden><div class="paneltitle"><h2>Apartment pets</h2><span id="petCount"></span></div><div id="companions"></div><details id="adoptionDesk" open><summary>Adopt a pet</summary><div id="petChoices" class="pet-choices" aria-label="Choose a species"></div><div id="adoptionNote" class="adoption-note"></div><label>Pet name<input id="petName" maxlength="20" placeholder="Choose a name" autocomplete="off"></label><label>Habitat<select id="petHabitat"></select></label><button id="adoptPet" class="primary">Adopt</button></details><p id="petFeedback" role="status"></p></section><div id="lifePanel" class="panel" hidden><div class="paneltitle"><h2>My little life</h2><span>PROGRESS</span></div><label>Career<select id="career"><option value="freelance">Brooklyn designer</option><option value="chef">Line cook</option><option value="artist">Studio artist</option><option value="trainer">Boxing coach</option><option value="gardener">Rooftop grower</option></select></label><div id="careerProgress" class="career-card" hidden></div><button id="shift" class="primary">Go to work · 12 sec</button><h3>Skills</h3><div id="skills"></div><div id="familyLife" hidden></div><h3>Relationships</h3><div id="relationships"></div><h3 id="styleTitle">Dressing room</h3><div id="editAppearance" class="appearance"></div><button id="applyAppearance">Save appearance</button><div id="savedLooks" hidden></div><h3>Household milestones</h3><div id="goals"></div><h3>Memory journal</h3><div id="journal"></div></div><div id="chatPanel" class="panel" hidden><div class="paneltitle"><h2>Apartment chat</h2><span>PRIVATE</span></div><div id="giftShop" hidden></div><div id="messages"></div><form id="chatForm"><input id="message" maxlength="220" placeholder="Say something…" autocomplete="off"><button class="primary">Send</button></form></div></aside></div></main><dialog id="inviteDialog"><h2>Make room for a friend.</h2><p>Open this game on another device and enter your private world code.</p><div id="inviteCode" class="invitecode"></div><label id="inviteLinkLabel" hidden>Invite link<input id="inviteUrl" readonly></label><button id="copyInviteLink" class="primary" hidden>Copy invite link</button><button id="copyInvite">Copy invite code</button><p class="help" id="inviteHelp"></p><details><summary>My character recovery key</summary><input id="recoveryKey" readonly><button id="copyRecovery">Copy recovery key</button></details><button id="closeInvite">Close</button></dialog><dialog id="doorDialog" aria-labelledby="doorTitle"><div class="door-top"><div class="door-key" aria-hidden="true">⚿</div><button id="closeDoorDialog" aria-label="Close invite dialog">×</button></div><h2 id="doorTitle">Invite a roommate</h2><p>Keep this game open while your friend visits. Your apartment and both characters save on this device.</p><p id="doorStatus" role="status"></p><div id="doorReady" hidden><label>Guest link<input id="guestUrl" readonly type="url" spellcheck="false"></label><button id="shareDoor" class="primary" hidden>Share invite link</button><button id="copyDoorLink">Copy invite link</button><details id="doorOptions"><summary>Other ways to invite</summary><label>Roommate invite<input id="roomCode" readonly></label><button id="copyDoor">Copy invite code</button><button id="guestFile" hidden>Save guest game with invite</button></details><p class="help" id="doorHint"></p></div><button id="retryDoor" hidden>Try opening again</button><button id="endDoor" hidden>End hosting</button></dialog><dialog id="childDialog"><form id="childForm"><label>Child’s name<input id="childName" maxlength="20" required></label><button class="primary">Save name</button><button id="childCancel" type="button">Cancel</button></form></dialog><dialog id="socialDialog"><h2 id="socialTitle">Spend time together</h2><button data-social="chat">Chat together</button><button data-social="compliment">Give a compliment</button><button data-social="hug">Give a hug</button><button data-social="outing" id="outing" hidden>Explore together · +14 friendship</button><div id="romanceActions"></div><button id="closeSocial">Cancel</button></dialog><script>/*! PeerJS 1.5.5 | MIT
 Copyright (c) 2015 Michelle Bu and Eric Zhang, http://peerjs.com
 
@@ -706,10 +708,18 @@ const ResidentStudio=(()=>{
     g.putImageData(frame,0,0);if(cache.size>=48)cache.delete(cache.keys().next().value);cache.set(key,cell);
     return cell;
   }
+  const badges=new Map();
   function portrait(canvas,appearance={},color=0){
     if(!canvas)return;
     const key=[appearance.hair,appearance.skin,appearance.hairColor,color,appearance.hat||0,appearance.hatDye??2,appearance.glasses||0].join(':')+'|'+[appearance.makeup||0,appearance.jewelry||0].join('/');
-    if(canvas.dataset.look===key)return;
+    const badge=canvas.id==='residentPortrait'||canvas.classList.contains('person-portrait');
+    const badgeKey=badge?key+'|'+JSON.stringify(appearance):key;
+    if(canvas.dataset.look===badgeKey)return;
+    if(badge&&badges.has(badgeKey)){canvas.getContext('2d').drawImage(badges.get(badgeKey),0,0,canvas.width,canvas.height);canvas.dataset.look=badgeKey;return;}
+    if(badge&&World3D.studio(canvas,appearance,color,false,-.14,0)){
+      const copy=document.createElement('canvas');copy.width=copy.height=96;copy.getContext('2d').drawImage(canvas,0,0,96,96);
+      if(badges.size>=36)badges.delete(badges.keys().next().value);badges.set(badgeKey,copy);canvas.dataset.look=badgeKey;return;
+    }
     const img=imageFor(appearance,color);if(!img)return;
     const g=canvas.getContext('2d');g.drawImage(img,0,0,canvas.width,canvas.height);g.save();g.scale(canvas.width/100,canvas.height/100);WardrobeArt.headwear(g,appearance);g.restore();canvas.dataset.look=key;
   }
@@ -779,10 +789,11 @@ const ResidentStudio=(()=>{
     if(!editing)$('studioPortrait').closest('figure').classList.toggle('full-look',tab==='wardrobe');
     if(tab==='face'){
       if(editing){const preview=el('canvas',undefined,'edit-portrait');preview.width=240;preview.height=240;root.append(preview);}
+      const features=el('div',undefined,'feature-group');root.append(features);
       for(const [key,label,names] of [['jaw','Jawline',['Classic','Square','Tapered']],['nose','Nose profile',['Classic','Soft','Defined']],['eyes','Eye spacing',['Classic','Close','Wide']]]){
         const field=el('label',label,'feature-select'),select=el('select');select.setAttribute('aria-label',label);
         names.forEach((name,i)=>{const option=el('option',name);option.value=i;select.append(option);});
-        select.value=obj[key]||0;select.onchange=()=>{obj[key]=Number(select.value);refresh();};field.append(select);root.append(field);
+        select.value=obj[key]||0;select.onchange=()=>{obj[key]=Number(select.value);refresh();};field.append(select);features.append(field);
       }
       group(root,'Hairstyle',styles,null,obj,'hair');
       group(root,'Skin tone',toneNames,skins,obj,'skin');group(root,'Hair color',dyeNames,hairColors,obj,'hairColor');
@@ -899,7 +910,7 @@ function furniturePreview(type,color) {
     FurnitureThumbnails.set(key,thumb.toDataURL());
   }
   const image=document.createElement('img');image.src=FurnitureThumbnails.get(key);image.alt='';
-  image.width=44;image.height=38;return image;
+  image.width=44;image.height=38;World3D.thumbnail(type,color,image);return image;
 }
 
 let roomBackdrop,backdropKey='',floorState,floorKey='';
@@ -1999,7 +2010,29 @@ const SoloDays=(()=>{
   }
   return {cache,previous,status,saveLook,restore,sync};
 })();
-</script><script>console.warn('Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation'),
+</script><script>/*The MIT License
+
+Copyright © 2010-2023 three.js authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+console.warn('Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation'),
 /**
  * @license
  * Copyright 2010-2023 Three.js Authors
@@ -2011,7 +2044,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 // Shared meshes and physically based materials for the world and the fitting room.
 const ModelKit=(()=>{
   const T=THREE, textures={}, mats=new Map(), geometries=new Map();
-  const boxGeo=new T.BoxGeometry(1,1,1), ballGeo=new T.SphereGeometry(1,24,18);
+  const boxGeo=new T.BoxGeometry(1,1,1), ballGeo=new T.SphereGeometry(1,18,14);
   function texture(key){
     if(!textures[key]){
       const tex=new T.TextureLoader().load(LotTextures[key]||RoomMaterials.urls[key]);
@@ -2102,30 +2135,55 @@ const Resident3D=(()=>{
     const blink={value:0};
     paint.onBeforeCompile=shader=>{shader.uniforms.blinkAmount=blink;
       shader.fragmentShader='uniform float blinkAmount;\n'+shader.fragmentShader.replace('#include <map_fragment>',
-        'vec2 fuv=vMapUv;float side=exp(-pow((abs(fuv.x-.5)-.089)/.052,4.));float eye=exp(-pow((fuv.y-.616)/.023,4.));fuv.y+=.035*blinkAmount*side*eye;diffuseColor*=texture2D(map,fuv);');};
+        'vec2 fuv=vMapUv;float side=exp(-pow(abs((abs(fuv.x-.5)-.089)/.052),4.));float eye=exp(-pow(abs((fuv.y-.616)/.023),4.));fuv.y+=.035*blinkAmount*side*eye;diffuseColor*=texture2D(map,fuv);');};
     const m=new T.Mesh(geo,paint);m.castShadow=true;m.userData.ownGeometry=m.userData.ownMaterial=true;parent.add(m);return {m,blink};
   }
-  function hairModel(g,a,dye){
-    const style=a.hair||0,cap=ball(g,0,.087,-.016,.138,.087,.122,dye);
-    const back=ball(g,0,.028,-.067,.137,.143,.083,dye);
-    if(style===4){cap.scale.multiplyScalar(.94);back.scale.multiplyScalar(.92);return;}
-    const long=[1,2,8,10,11].includes(style),curl=[0,5,9].includes(style);
-    if(long){
-      ball(g,0,-.06,-.092,.14,style===1?.155:.214,.065,dye);
-      for(const side of [-1,1])for(let j=0;j<4;j++){
-        const strand=ball(g,side*(.108+j*.006),-.035-j*.008,-.018+j*.019,.028,style===1?.115:.17,.028,dye);
-        strand.rotation.z=side*(.12-j*.032);
+  const hairPaint=new Map(),locks=new Map();
+  function hairMaterial(dye){
+    if(hairPaint.has(dye))return hairPaint.get(dye);
+    const c=document.createElement('canvas');c.width=128;c.height=192;const g=c.getContext('2d');
+    g.fillStyle=dye;g.fillRect(0,0,128,192);
+    for(let i=0;i<203;i++){
+      const x=(i*47.27)%142-7;g.strokeStyle=i%3?'rgba(235,207,161,.16)':'rgba(19,17,22,.34)';
+      g.lineWidth=.5+(i%4)*.32;g.beginPath();g.moveTo(x,0);g.bezierCurveTo(x+3,68,x-5,138,x+1,192);g.stroke();
+    }
+    const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;tex.wrapS=tex.wrapT=T.RepeatWrapping;
+    const mat=new T.MeshStandardMaterial({map:tex,color:'#dfd2bc',roughness:.66});hairPaint.set(dye,mat);return mat;
+  }
+  function locksFor(style){
+    if(locks.has(style))return locks.get(style);
+    const positions=[],uv=[],indices=[];
+    function strand(curve,radius,depth,breadth){
+      const n=12,sides=7,base=positions.length/3;
+      for(let j=0;j<=n;j++){
+        const v=j/n,pt=curve.getPoint(v),tan=curve.getTangent(v),front=new T.Vector3(pt.x,.04,pt.z).normalize();
+        const side=new T.Vector3().crossVectors(tan,front).normalize(),normal=new T.Vector3().crossVectors(side,tan).normalize();
+        const taper=.12+.88*Math.sin(Math.PI*(.16+.84*v))**.72;
+        for(let i=0;i<=sides;i++){const a=i/sides*Math.PI*2,vertex=pt.clone().addScaledVector(side,Math.cos(a)*radius*breadth*taper).addScaledVector(normal,Math.sin(a)*radius*depth*taper);
+          positions.push(vertex.x,vertex.y,vertex.z);uv.push(i/sides,1-v);
+          if(j<n&&i<sides){const k=base+j*(sides+1)+i;indices.push(k,k+sides+1,k+1,k+1,k+sides+1,k+sides+2);}
+        }
       }
     }
-    if(style===3||style===9)ball(g,0,.18,-.055,style===9?.119:.077,style===9?.103:.071,.087,dye);
-    const strands=style===8?13:curl?27:16;
-    for(let i=0;i<strands;i++){
-      const angle=(i/strands)*Math.PI*2,y=.079+.016*Math.sin(3*angle);
-      const x=.109*Math.sin(angle),z=.084*Math.cos(angle)-.008;
-      if(style===8){for(let j=0;j<8;j++)ball(g,x,y-j*.029,z,.019,.024,.018,dye);}
-      else{const lock=ball(g,x,y,z,curl?.041:.027,curl?.040:.057,.035,dye);lock.rotation.z=-.29*Math.cos(angle)+(style===7?.55:0);}
+    const long=[1,2,8,10,11].includes(style),curly=[0,5,9].includes(style),amount=style===4?42:curly?116:76;
+    for(let i=0;i<amount;i++){
+      const a=i*2.39996,layer=(i%5)/4,side=Math.sin(a),front=Math.cos(a);
+      const frontness=Math.max(0,front),length=style===4?.04:long?.25*(1-frontness**2)+.06:style===7?.072+Math.max(0,side)*.075:.107-.05*frontness;
+      const phase=style===6?0:Math.sin(i*3.1)*.14+.27;
+      const pt=(ang,r,y)=>new T.Vector3(Math.sin(ang)*r,y,Math.cos(ang)*r*.9-.015);
+      const start=pt(a-.66,.025+layer*.037,.165-layer*.012),mid=pt(a-.27,.104+layer*.016,.133-layer*.016);
+      const bend=pt(a,.134+layer*.01,.096-layer*.023),end=pt(a+phase,.129+(long?.012:0)+.008*Math.sin(i),.112-length-layer*.027);
+      if(style===5||style===9){mid.y+=.018;bend.y+=.018;end.x*=1.05;end.z*=1.05;}
+      strand(new T.CatmullRomCurve3([start,mid,bend,end]),style===4?.008:curly?.016:style===8?.015:.018,curly?.85:.50,1);
     }
-    if(style===6)for(let i=-3;i<=3;i++){const row=ball(g,i*.027,.123,-.007,.011,.03,.101,dye);row.rotation.z=-i*.1;}
+    const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.setIndex(indices);geo.computeVertexNormals();locks.set(style,geo);return geo;
+  }
+  function hairModel(g,a,dye){
+    const style=a.hair||0,mat=hairMaterial(dye);
+    ball(g,0,.093,-.022,.132,.077,.121,mat);ball(g,0,.023,-.073,.129,.132,.076,mat);
+    if([1,2,8,10,11].includes(style))ball(g,0,-.088,-.092,.13,style===1?.12:.189,.053,mat);
+    if(style===3||style===9)ball(g,0,.18,-.055,style===9?.109:.073,style===9?.102:.067,.083,mat);
+    const m=ModelKit.mesh(g,locksFor(style),mat,undefined,0,0,0);mat.side=T.DoubleSide;
   }
   function create(raw={},color=0){
     const a={...Wardrobe.normalize(raw),...raw,color},root=group(),body=group(root),skin=skins[a.skin||0],dye=hairColors[a.hairColor||0],shirt=outfits[color||0],pants=Wardrobe.dyes[a.bottomDye],shoe=Wardrobe.dyes[a.shoeDye],hat=Wardrobe.dyes[a.hatDye],bag=Wardrobe.dyes[a.bagDye],ink='#443c36';
@@ -2161,7 +2219,7 @@ const Resident3D=(()=>{
     if(top===7)for(let i=-2;i<=2;i++){box(upper,i*.055,.21,.107,.009,.33,.004,'#513e3a');box(upper,0,.22+i*.056,.11,.247,.009,.004,'#513e3a');}
     if(top===3)ball(upper,0,.35,-.086,.128,.095,.065,shirt,'cloth');
     const neck=tube(upper,0,.463,0,.052,.068,.125,skin);
-    const head=group(upper,0,.631,.003);
+    const head=group(upper,0,.615,.003);head.scale.setScalar(.89);
     ball(head,0,.005,-.028,.125,.151,.103,skin);
     for(const side of [-1,1]){
       ball(head,side*.126,-.016,-.002,.026,.042,.024,skin);
@@ -2229,13 +2287,32 @@ const Furniture3D=(()=>{
       if(flowers)ball(g,end[0],h+.065,end[2],.049,.043,.048,['#efad93','#d48188','#e9c974'][i%3]);
     }
   }
+  let crown;
+  function foliage(){
+    if(crown)return crown;
+    const xyz=[],rgb=[],colors=['#7b9963','#91a971','#6a8655','#9eb67e','#859c67'].map(c=>new THREE.Color(c));
+    for(let i=0;i<112;i++){
+      const angle=i*2.399963,height=1-2*(i+.5)/112,rad=Math.sqrt(1-height*height),s=.85+.16*Math.sin(i*17.3);
+      const x=rad*Math.cos(angle)*s,y=height*s,z=rad*Math.sin(angle)*s;
+      const side=new THREE.Vector3(-Math.sin(angle),.16*Math.cos(i),Math.cos(angle)).normalize(),tip=new THREE.Vector3(x*.4+.1,.52+y*.26,z*.4).normalize();
+      const pt=new THREE.Vector3(x,y,z),width=.105+.062*(i%5)/4,len=.23+.1*(i%3);
+      const a=pt.clone().addScaledVector(tip,-len*.5),b=pt.clone().addScaledVector(side,width),c=pt.clone().addScaledVector(tip,len*.61),d=pt.clone().addScaledVector(side,-width),mid=pt.clone().addScaledVector(new THREE.Vector3(x,y,z),.077);
+      for(const v of [a,b,mid,b,c,mid,c,d,mid,d,a,mid]){xyz.push(v.x,v.y,v.z);const tone=colors[(i+(v===mid?1:0))%colors.length];rgb.push(tone.r,tone.g,tone.b);}
+    }
+    crown=new THREE.BufferGeometry();crown.setAttribute('position',new THREE.Float32BufferAttribute(xyz,3));crown.setAttribute('color',new THREE.Float32BufferAttribute(rgb,3));crown.computeVertexNormals();return crown;
+  }
+  const leafMats=new Map();
   function tree(p,x,z,s=1,season='Spring'){
     const g=group(p,x,-.12,z);g.scale.setScalar(s);
-    tube(g,0,.77,0,.098,.155,1.55,'#685243','oak');
-    for(let i=0;i<10;i++){const a=i*2.399,rad=.62*(1-i/16),h=1.43+(i%4)*.32;
-      const end=[Math.cos(a)*rad,h,Math.sin(a)*rad];rod(g,[0,.82,0],end,.054,'#675448','oak',.025);
-      const colors=season==='Autumn'?['#b67a3e','#a65c37','#c79451']:season==='Winter'?['#879585','#929d8d','#798976']:['#71894e','#607b4f','#849657'];
-      if(season!=='Winter'||i%3===0)ball(g,...end,.48,.49,.47,colors[i%3],'grass');
+    tube(g,0,.72,0,.084,.137,1.54,'#795f49','oak');
+    if(!leafMats.has(season))leafMats.set(season,new THREE.MeshStandardMaterial({color:season==='Autumn'?'#db9e61':'#e6edcb',roughness:.89,vertexColors:true,side:THREE.DoubleSide}));
+    for(let i=0;i<12;i++){
+      const a=i*2.399,rad=.67*(1-i/18),h=1.4+(i%5)*.25,end=[Math.cos(a)*rad,h,Math.sin(a)*rad];
+      rod(g,[0,.72,0],end,.059,'#765d4c','oak',.023);
+      for(const s of [-1,1])rod(g,end,[end[0]+s*.22,end[1]+.31,end[2]+.15*s],.024,'#806d54','oak',.009);
+      if(season==='Winter')continue;
+      const leaf=ModelKit.mesh(g,foliage(),leafMats.get(season),undefined,...end);
+      leaf.rotation.y=a;leaf.scale.set(.57,.58,.54);
     }
   }
   function cabinet(p,w=.88,h=.7,d=.63,c=wood){
@@ -2458,7 +2535,7 @@ const World3D=(()=>{
     try{
       renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
       renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
-      renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.10;
+      renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
       // A studio window panorama gives glass, metal and wet surfaces a roughness-filtered reflection.
       const c=document.createElement('canvas');c.width=512;c.height=256;const g=c.getContext('2d');
       const gradient=g.createLinearGradient(0,0,0,256);
@@ -2480,7 +2557,7 @@ const World3D=(()=>{
     if(!canvas||!init()||failed||!ResidentStudio.imageFor(a,color))return false;
     let model=mirrors.get(canvas),sig=JSON.stringify([a,color]);
     if(!model||model.sig!==sig){if(model)release(model.rig.root);const rig=Resident3D.create(a,color);model={sig,rig};mirrors.set(canvas,model);}
-    for(const [c,m] of mirrors){if(!c.isConnected){release(m.rig.root);mirrors.delete(c);}}
+    for(const [c,m] of mirrors){if(c!==canvas&&!c.isConnected){release(m.rig.root);mirrors.delete(c);}}
     const rig=model.rig;studioScene.add(rig.root);rig.root.rotation.y=angle+.07;Resident3D.animate(rig,t,0,85);
     const height=rig.root.scale.y,focus=full?.81*height:1.415*height,dist=full?3.72*height:1.20*height;
     studioCamera.aspect=canvas.width/canvas.height;studioCamera.position.set(0,focus+(full?.15:.015),dist/Math.min(1,studioCamera.aspect));
@@ -2488,6 +2565,32 @@ const World3D=(()=>{
     resizeRenderer(canvas.width,canvas.height,1);renderer.render(studioScene,studioCamera);
     canvas.getContext('2d').drawImage(renderer.domElement,0,0,canvas.width,canvas.height);rig.root.removeFromParent();
     canvas.dataset.look='3d:'+sig;return true;
+  }
+  const itemShots=new Map(),queue=[];
+  function thumbnail(type,color,image){
+    const key=type+'/'+color;
+    if(itemShots.has(key)){image.src=itemShots.get(key);return;}
+    image.dataset.modelKey=key;image.dataset.modelColor=color;image.dataset.modelType=type;visibleItems.observe(image);
+  }
+  const visibleItems=new IntersectionObserver(entries=>{
+    for(const {target,isIntersecting} of entries)if(isIntersecting){visibleItems.unobserve(target);queue.push(target);}
+    if(queue.length&&!drawingItems){drawingItems=true;requestAnimationFrame(nextItem);}
+  });
+  let drawingItems=false;
+  function nextItem(){
+    const image=queue.shift();
+    if(image?.isConnected&&init()&&!failed){
+      const key=image.dataset.modelKey;
+      if(!itemShots.has(key)){
+        const item=Furniture3D.make(image.dataset.modelType,palette[Number(image.dataset.modelColor)]||palette[0]);
+        const bounds=new T.Box3().setFromObject(item),focus=bounds.getCenter(new T.Vector3()),rad=bounds.getSize(new T.Vector3()).length()*.5;
+        const cam=new T.PerspectiveCamera(29,1.16,.02,24);cam.position.copy(focus).addScaledVector(new T.Vector3(.67,.54,.83).normalize(),Math.max(.4,rad*3.9));
+        cam.lookAt(focus);studioScene.add(item);resizeRenderer(100,86,1);renderer.render(studioScene,cam);
+        itemShots.set(key,renderer.domElement.toDataURL());item.removeFromParent();
+      }
+      image.src=itemShots.get(key);
+    }
+    if(queue.length)requestAnimationFrame(nextItem);else drawingItems=false;
   }
   function rotate(amount){yaw+=amount;}
   function tilt(amount){elev=Math.min(.99,Math.max(.35,elev+amount));}
@@ -2530,12 +2633,56 @@ const World3D=(()=>{
     }else Lot3D.city(draft,me.place,s);
     world=batch(draft);scene.add(world);
   }
+  let reflection,reflectionCam,reflectAt=0,reflectKey='';
+  const reflectionMatrix={value:new T.Matrix4()},reflectionMap={value:null},strength={value:0};
+  function bindReflection(mat){
+    if(mat.userData.planar)return;
+    mat.userData.planar=true;mat.userData.reflectWeight={value:1};
+    mat.onBeforeCompile=shader=>{
+      Object.assign(shader.uniforms,{reflectMatrix:reflectionMatrix,mirrorTex:reflectionMap,mirrorStrength:strength,mirrorWeight:mat.userData.reflectWeight});
+      shader.vertexShader='uniform mat4 reflectMatrix;varying vec4 reflected;\n'+shader.vertexShader.replace('#include <project_vertex>',`#include <project_vertex>
+        vec4 rp=vec4(transformed,1.);
+        #ifdef USE_INSTANCING
+        rp=instanceMatrix*rp;
+        #endif
+        reflected=reflectMatrix*modelMatrix*rp;`);
+      shader.fragmentShader='uniform sampler2D mirrorTex;uniform float mirrorStrength;uniform float mirrorWeight;varying vec4 reflected;\n'+shader.fragmentShader.replace('#include <opaque_fragment>',`vec2 st=reflected.xy/reflected.w*.5+.5;
+        if(mirrorWeight>0.&&mirrorStrength>0.&&st.x>0.&&st.y>0.&&st.x<1.&&st.y<1.){
+          vec3 mirror=texture2D(mirrorTex,st).rgb;
+          float grazing=1.-abs(dot(normalize(vViewPosition),normal));
+          outgoingLight=mix(outgoingLight,mirror,mirrorStrength*(.30+.52*grazing));}
+        #include <opaque_fragment>`);
+    };
+    mat.needsUpdate=true;
+  }
+  function reflect(s,me,n,now){
+    const wet=/drizzle|rain/i.test(s.borough?.weather?.weather||'');
+    const pool=me.place==='home'?s.objects.find(o=>['aquarium','fountain','bathtub'].includes(o.t)):null,park=me.place==='park';
+    if(!wet&&!pool&&!park){strength.value=0;return;}
+    const h=wet?-.254:park?.62:pool.t==='aquarium'?.887:pool.t==='bathtub'?.523:.326;
+    const key=[me.place,h,previousKey,Math.round(yaw*30),Math.round(zoom*15),Math.round(panX/12),Math.round(panY/12)].join('|');
+    if(now-reflectAt<220&&key===reflectKey)return;reflectKey=key;reflectAt=now;
+    if(!reflection){reflection=new T.WebGLRenderTarget(320,192,{minFilter:T.LinearFilter,magFilter:T.LinearFilter});reflectionCam=new T.OrthographicCamera();reflectionMap.value=reflection.texture;}
+    for(const part of world.children){
+      const mat=part.material,isRoad=mat.map?.image&&mat.map.image===ModelKit.material('#989ca1','road').map.image;
+      const glossy=wet?isRoad:mat.metalness===.54;if(glossy)bindReflection(mat);if(mat.userData.planar)mat.userData.reflectWeight.value=glossy?1:0;
+    }
+    reflectionCam.copy(worldCam);reflectionCam.position.y=2*h-worldCam.position.y;
+    const dir=worldCam.getWorldDirection(new T.Vector3());dir.y*=-1;
+    const vertical=new T.Vector3(0,1,0).applyQuaternion(worldCam.quaternion);vertical.y*=-1;
+    reflectionCam.up.copy(vertical);reflectionCam.lookAt(reflectionCam.position.clone().add(dir));reflectionCam.updateMatrixWorld();
+    reflectionMatrix.value.multiplyMatrices(reflectionCam.projectionMatrix,reflectionCam.matrixWorldInverse);
+    renderer.setRenderTarget(reflection);const auto=renderer.shadowMap.autoUpdate;renderer.shadowMap.autoUpdate=false;
+    renderer.clippingPlanes=[new T.Plane(new T.Vector3(0,1,0),-h-.012)];
+    strength.value=0;reflectionMap.value=null;renderer.render(scene,reflectionCam);
+    renderer.clippingPlanes=[];renderer.shadowMap.autoUpdate=auto;renderer.setRenderTarget(null);reflectionMap.value=reflection.texture;strength.value=wet?.52:.73;
+  }
   function lighting(s,n){
     const clock=s.clock??480,f=s.borough?.weather?.weather||'Clear',over=/cloud|rain|drizzle|snow|flurr/i.test(f);
     const k=Math.max(0,Math.min(1,(Math.sin((clock/1440-.25)*Math.PI*2)+.16)*2)),warm=Math.max(0,1-Math.abs(k-.42)*1.72),cx=n/2;
     if(!scene.background)scene.background=new T.Color();
     scene.background.copy(nightColor).lerp(dayColor,k);
-    lights.intensity=.79+k*(over?.63:.85);lights.color.set(k<.2?0xb5c8e2:over?0xdfebee:0xffefe1);
+    lights.intensity=.69+k*(over?.52:.59);lights.color.set(k<.2?0xb5c8e2:over?0xdfebee:0xffefe1);
     sun.intensity=.31+k*(over?1.05:2.68);sun.color.set(k<.18?0xbacff0:warm>.54?0xffca91:0xffe6c4);
     const angle=clock/1440*Math.PI*2;sun.position.set(cx+Math.sin(angle)*12,7+8*k,cx+Math.cos(angle)*7+3);sun.target.position.set(cx,0,cx);
     lamp.position.set(2.6,1.96,2.6);lamp.intensity=(1-k)*34;
@@ -2575,6 +2722,24 @@ const World3D=(()=>{
     }
     for(const [id,r] of animals)if(!seen.has(id)){release(r);animals.delete(id);}
   }
+  const precipitation=new T.BufferGeometry(),flakes=new Float32Array(192*6);
+  precipitation.setAttribute('position',new T.BufferAttribute(flakes,3).setUsage(T.DynamicDrawUsage));
+  const rainfall=new T.LineSegments(precipitation,new T.LineBasicMaterial({color:0xa4bfd2,transparent:true,opacity:.56,depthWrite:false}));
+  rainfall.frustumCulled=false;scene.add(rainfall);
+  function weather(s,home,n,t){
+    const forecast=s.borough?.weather?.weather||'',snow=/snow|flurr/i.test(forecast);
+    rainfall.visible=snow||/rain|drizzle/i.test(forecast);
+    if(!rainfall.visible)return;
+    rainfall.material.color.set(snow?0xf3f6ee:0x94b4c5);
+    const size=n+18;
+    for(let i=0;i<192;i++){
+      const x=-9+(i*13.371%size),z=-9+(i*31.329%size),y=7-((i*.773+t*(snow?.78:4.6))%7);
+      const at=i*6,roof=home&&x>-.12&&z>-.12&&x<n+.12&&z<n+.12;
+      const xx=x+(snow?.12*Math.sin(t+i):y*.026),yy=roof?-1:y;
+      flakes.set([xx,yy,z,xx+(snow?.016:.031),yy+(snow?.052:.225),z+.009],at);
+    }
+    precipitation.attributes.position.needsUpdate=true;
+  }
   const hoverTile=box(scene,0,.059,0,.97,.016,.97,'#87bcb1');hoverTile.visible=false;hoverTile.castShadow=false;
   function draw(s,me,w,h,n,now){
     if(!init()||failed){active=false;return false;}
@@ -2583,20 +2748,20 @@ const World3D=(()=>{
       if(lastPlace!==me.place){for(const r of rigs.values())release(r.rig.root);rigs.clear();lastPlace=me.place;}
       camera(w,h,n,me.place==='home');rebuild(s,me,n);lighting(s,n);
       const t=stillStreets.matches?0:now/1000,labels=people(s,me,t,dt);
-      pets(s,me.place,t);hoverTile.visible=mode==='build'&&me.place==='home'&&hover&&hover.x>=0&&hover.y>=0&&hover.x<n&&hover.y<n;
+      pets(s,me.place,t);weather(s,me.place==='home',n,t);hoverTile.visible=mode==='build'&&me.place==='home'&&hover&&hover.x>=0&&hover.y>=0&&hover.x<n&&hover.y<n;
       if(hoverTile.visible)hoverTile.position.set(hover.x+.5,.055,hover.y+.5);
       resizeRenderer(w,h,Math.min(devicePixelRatio||1,1.5,1250/Math.max(w,h)));
-      renderer.render(scene,worldCam);ctx.drawImage(renderer.domElement,0,0,w,h);
+      reflect(s,me,n,now);renderer.render(scene,worldCam);ctx.drawImage(renderer.domElement,0,0,w,h);
       for(const [p,pt] of labels){
         ctx.save();ctx.font='600 11px system-ui';ctx.textAlign='center';const name=p.name+(p.online?'':' · away'),mw=ctx.measureText(name).width+14;
-        ctx.fillStyle=p.id===s.me?'#254c47ed':'#fbf7ede8';ctx.beginPath();ctx.roundRect(pt.x-mw/2,pt.y-18,mw,17,7);ctx.fill();
+        ctx.fillStyle=p.id===s.me?'#254c47ed':'#fbf7ede8';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(pt.x-mw/2,pt.y-18,mw,17,7);else ctx.rect(pt.x-mw/2,pt.y-18,mw,17);ctx.fill();
         ctx.fillStyle=p.id===s.me?'#fff9ed':'#294944';ctx.fillText(name,pt.x,pt.y-6);BoroughUI.gesture(p,pt.x+mw/2+3,pt.y-9);ctx.restore();
       }
-      if(me.place!=='home')BoroughUI.atmosphere();
+      if(me.place!=='home'&&s.borough?.weather?.weather==='Breezy')BoroughUI.atmosphere();
       active=true;canvas.dataset.renderer='webgl';return true;
     }catch(error){console.error('3D scene:',error);failed=true;active=false;return false;}
   }
-  return {draw,screen,pick,tile,rotate,tilt,reset,studio,get active(){return active;},get yaw(){return yaw;}};
+  return {draw,screen,pick,tile,rotate,tilt,reset,studio,thumbnail,get active(){return active;},get yaw(){return yaw;}};
 })();
 </script><script>'use strict';
 let N=12;const $=id=>document.getElementById(id), palette=['#e8bc87','#c9a18b','#b8d5c0','#e1cf9c','#96a9c6','#d7b2ca','#708c78','#efdfc7'], outfits=['#d58a69','#668fa6','#779c76','#aa83b7','#e0b85e','#4f6469'];
@@ -2767,7 +2932,7 @@ function resize(){let r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRat
 let lastFrame=0;
 function draw(time){requestAnimationFrame(draw);if(!state||!W||!H||document.hidden||time-lastFrame<32)return;lastFrame=time;
 const resident=currentResident();
-if(World3D.draw(state,resident,W,H,N,time))return;
+if(World3D.draw(state,resident,W,H,N,time)){$('orbitLeft').hidden=$('orbitRight').hidden=false;return;}
 canvas.dataset.renderer='canvas';$('orbitLeft').hidden=$('orbitRight').hidden=true;
 const night=state.clock<360||state.clock>=1140;
 if(resident.place!=='home'){streetView(resident,night);BoroughUI.atmosphere();return;}S=Math.max(8,Math.min((W-28)/(2*N),(H-80)/(N+2)))*zoom;ox=W/2+panX;oy=(H-N*S)/2+Math.max(0,2.23*S/zoom-(H-N*S/zoom)/2)+panY;hit=[];roomShell(night);
