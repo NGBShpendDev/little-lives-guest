@@ -833,7 +833,7 @@ const ResidentStudio=(()=>{
       if(!preview)continue;const r=preview.getBoundingClientRect();if(r.width&&r.bottom>0&&r.top<innerHeight)modelPreview(preview,view.obj,view.tab==='wardrobe',now/1000);
     }
   }
-  requestAnimationFrame(animateStudio);
+  window.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(animateStudio),{once:true});
   function editor(root,obj,editing,tab){
     const prev=views.get(root);
     views.set(root,{obj,editing,tab:tab||prev?.tab||'face',slot:prev?.slot||'top'});renderEditor(root);
