@@ -745,10 +745,10 @@ const ResidentStudio=(()=>{
     if(full)WardrobeArt.stage(c,obj,obj.color||0);else portrait(c,obj,obj.color||0);
   }
   function refresh(){
-    modelPreview($('studioPortrait'),look,views.get($('landingAppearance'))?.tab==='wardrobe');$('currentStyle').textContent=styles[look.hair||0];
+    if(!$('landing').hidden)modelPreview($('studioPortrait'),look,views.get($('landingAppearance'))?.tab==='wardrobe');$('currentStyle').textContent=styles[look.hair||0];
     for(const [root,view] of views){
       const preview=root.querySelector('.fit-preview,.edit-portrait');
-      if(preview)modelPreview(preview,view.obj,view.tab==='wardrobe');
+      if(preview&&root.getClientRects().length)modelPreview(preview,view.obj,view.tab==='wardrobe');
     }
     for(const [root,view] of views){
       for(const tile of root.querySelectorAll('canvas[data-garment]'))WardrobeArt.detail(tile,view.obj,view.obj.color||0,view.slot,Number(tile.dataset.garment));
@@ -826,7 +826,7 @@ const ResidentStudio=(()=>{
   }
   let lastPreview=0;
   function animateStudio(now){
-    requestAnimationFrame(animateStudio);if(document.hidden||now-lastPreview<105||matchMedia('(prefers-reduced-motion: reduce)').matches)return;lastPreview=now;
+    requestAnimationFrame(animateStudio);if(document.hidden||World3D.lowPower||now-lastPreview<105||matchMedia('(prefers-reduced-motion: reduce)').matches)return;lastPreview=now;
     for(const [root,view] of views){
       if(!root.getClientRects().length)continue;
       const preview=view.editing?root.querySelector('.fit-preview,.edit-portrait'):$('studioPortrait');
@@ -2528,12 +2528,16 @@ const World3D=(()=>{
   const fill=new T.DirectionalLight(0xc0e1e6,1.4);fill.position.set(2,1,-3);studioScene.add(fill);
   const stage=ModelKit.tube(studioScene,0,-.046,0,2,2,.07,'#a4c9c8');
   const studioCamera=new T.PerspectiveCamera(29,1,.02,40);
-  let renderer,failed=false,world,objects=[],previousKey='',layoutState,layoutSignature='',lastFrame=0,lastPlace='',active=false,viewport=[1,1],yaw=Math.PI/4,elev=.64;
+  let lowPower=false,renderer,failed=false,world,objects=[],previousKey='',layoutState,layoutSignature='',lastFrame=0,lastPlace='',active=false,viewport=[1,1],yaw=Math.PI/4,elev=.64;
   let cachedWeather='',envTarget,nightColor=new T.Color('#637388'),dayColor=new T.Color('#d7ded4');
   function init(){
     if(renderer)return true;if(failed)return false;
     try{
       renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
+      const gl=renderer.getContext(),debug=gl.getExtension('WEBGL_debug_renderer_info');
+      const device=debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):'';
+      lowPower=/swiftshader|llvmpipe|software rasterizer/i.test(device);
+      if(lowPower)sun.shadow.mapSize.set(384,384);
       renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
       renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
       // A studio window panorama gives glass, metal and wet surfaces a roughness-filtered reflection.
@@ -2562,7 +2566,7 @@ const World3D=(()=>{
     const height=rig.root.scale.y,focus=full?.81*height:1.415*height,dist=full?3.72*height:1.20*height;
     studioCamera.aspect=canvas.width/canvas.height;studioCamera.position.set(0,focus+(full?.15:.015),dist/Math.min(1,studioCamera.aspect));
     studioCamera.lookAt(0,focus,0);studioCamera.updateProjectionMatrix();
-    resizeRenderer(canvas.width,canvas.height,1);renderer.render(studioScene,studioCamera);
+    resizeRenderer(canvas.width,canvas.height,lowPower?Math.min(1,188/Math.max(canvas.width,canvas.height)):1);renderer.render(studioScene,studioCamera);
     canvas.getContext('2d').drawImage(renderer.domElement,0,0,canvas.width,canvas.height);rig.root.removeFromParent();
     canvas.dataset.look='3d:'+sig;return true;
   }
@@ -2750,7 +2754,7 @@ const World3D=(()=>{
       const t=stillStreets.matches?0:now/1000,labels=people(s,me,t,dt);
       pets(s,me.place,t);weather(s,me.place==='home',n,t);hoverTile.visible=mode==='build'&&me.place==='home'&&hover&&hover.x>=0&&hover.y>=0&&hover.x<n&&hover.y<n;
       if(hoverTile.visible)hoverTile.position.set(hover.x+.5,.055,hover.y+.5);
-      resizeRenderer(w,h,Math.min(devicePixelRatio||1,1.5,1250/Math.max(w,h)));
+      resizeRenderer(w,h,Math.min(devicePixelRatio||1,1.5,(lowPower?490:1250)/Math.max(w,h)));
       reflect(s,me,n,now);renderer.render(scene,worldCam);ctx.drawImage(renderer.domElement,0,0,w,h);
       for(const [p,pt] of labels){
         ctx.save();ctx.font='600 11px system-ui';ctx.textAlign='center';const name=p.name+(p.online?'':' · away'),mw=ctx.measureText(name).width+14;
@@ -2761,7 +2765,7 @@ const World3D=(()=>{
       active=true;canvas.dataset.renderer='webgl';return true;
     }catch(error){console.error('3D scene:',error);failed=true;active=false;return false;}
   }
-  return {draw,screen,pick,tile,rotate,tilt,reset,studio,thumbnail,get active(){return active;},get yaw(){return yaw;}};
+  return {draw,screen,pick,tile,rotate,tilt,reset,studio,thumbnail,get frameInterval(){return lowPower?154:32;},get lowPower(){return lowPower;},get active(){return active;},get yaw(){return yaw;}};
 })();
 </script><script>'use strict';
 let N=12;const $=id=>document.getElementById(id), palette=['#e8bc87','#c9a18b','#b8d5c0','#e1cf9c','#96a9c6','#d7b2ca','#708c78','#efdfc7'], outfits=['#d58a69','#668fa6','#779c76','#aa83b7','#e0b85e','#4f6469'];
@@ -2930,7 +2934,7 @@ function character(p){
 }
 function resize(){let r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;canvas.width=Math.round(W*d);canvas.height=Math.round(H*d);ctx.setTransform(d,0,0,d,0,0)}new ResizeObserver(resize).observe(canvas);
 let lastFrame=0;
-function draw(time){requestAnimationFrame(draw);if(!state||!W||!H||document.hidden||time-lastFrame<32)return;lastFrame=time;
+function draw(time){requestAnimationFrame(draw);if(!state||!W||!H||document.hidden||time-lastFrame<World3D.frameInterval)return;lastFrame=time;
 const resident=currentResident();
 if(World3D.draw(state,resident,W,H,N,time)){$('orbitLeft').hidden=$('orbitRight').hidden=false;return;}
 canvas.dataset.renderer='canvas';$('orbitLeft').hidden=$('orbitRight').hidden=true;
