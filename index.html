@@ -1522,6 +1522,7 @@ const BoroughLife=(()=>{
   const proposals={flirt:{name:'Flirt',points:8},kiss:{name:'Kiss',points:12},cuddle:{name:'Cuddle',points:10},date:{name:'Ask on a date',points:12,stage:0},engage:{name:'Propose engagement',points:10,stage:1,min:30},marry:{name:'Plan a wedding',points:12,stage:2,min:45},baby:{name:'Start a pregnancy',points:5,stage:3}};
   const stages=['Roommates','Dating','Engaged','Married'];
   const publicId=id=>id.slice(0,12);
+  const garments=look=>Object.fromEntries(['hat','top','bottom','shoes','glasses','bag','jewelry','hatDye','bottomDye','shoeDye','bagDye','color'].filter(k=>look[k]!==undefined).map(k=>[k,look[k]]));
   const friendship=n=>n>=80?'Best friends':n>=40?'Close friends':n>=15?'Friends':'Acquaintances';
   const choose=(map,key,err)=>{if(!Object.hasOwn(map,key))throw Error(err);return map[key];};
   function weather(day){
@@ -1616,9 +1617,9 @@ const BoroughLife=(()=>{
     }
     if(a.kind==='lookbook'){
       if(!['Daytime','Evening','Weekend'].includes(a.slot))throw Error('Choose an outfit slot.');
-      if(task==='save'){p.lookbook[a.slot]={...p.appearance};return;}
+      if(task==='save'){p.lookbook[a.slot]=garments(p.appearance);return;}
       if(task!=='wear'||!p.lookbook[a.slot])throw Error('Save an outfit here first.');
-      p.appearance={...p.lookbook[a.slot]};p.color=p.appearance.color;return;
+      p.appearance={...p.appearance,...garments(p.lookbook[a.slot])};p.color=p.appearance.color;return;
     }
     if(occupied(p))throw Error('Finish your shift first.');
     if(a.kind==='shop'){
@@ -1792,7 +1793,7 @@ const BoroughUI=(()=>{
     memo('localLife',[b.pantry,b.meals,away,busy],root=>{
       const card=section(root,'Household kitchen');card.append(el('small',b.pantry+' grocery portions in the pantry'));
       for(const [key,r] of Object.entries(BoroughLife.recipes)){
-        const row=el('div',undefined,'borough-line');row.append(el('span',r.name),el('small',r.units+' groceries · '+r.servings+' servings'));
+        const row=el('div',undefined,'borough-line');row.append(el('span',r.name),el('small',r.units+' pantry '+(r.units===1?'portion':'portions')+' · '+r.servings+' '+(r.servings===1?'serving':'servings')));
         button(row,'Cook',{kind:'kitchen',task:'cook',recipe:key},away||busy||b.pantry<r.units);
         const n=b.meals.find(d=>d.recipe===key)?.servings||0;
         if(n)button(row,'Eat · '+n+' left',{kind:'kitchen',task:'eat',recipe:key},away||busy);
