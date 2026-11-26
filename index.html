@@ -661,7 +661,7 @@ const ResidentStudio=(()=>{
     if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',ready,{once:true});else ready();
   };
   let extraSource;const extra=new Image();
-  extra.onload=()=>{extraSource=document.createElement('canvas');extraSource.width=extra.width;extraSource.height=extra.height;extraSource.getContext('2d',{willReadFrequently:true}).drawImage(extra,0,0);refresh();if(state){const me=currentResident();portrait($('residentPortrait'),me.appearance,me.color);lastHouse='';}};
+  extra.onload=()=>{extraSource=document.createElement('canvas');extraSource.width=extra.width;extraSource.height=extra.height;extraSource.getContext('2d',{willReadFrequently:true}).drawImage(extra,0,0);const ready=()=>{refresh();if(state){const me=currentResident();portrait($('residentPortrait'),me.appearance,me.color);lastHouse='';}};if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',ready,{once:true});else ready();};
   extra.src=BrooklynHair;
   atlas.src=StudioArt.portraits;
   const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
@@ -1084,7 +1084,7 @@ const StreetArt = (() => {
     harlem:['TAILOR','LENOX JAZZ','VINYL & TAPES','SUPPER CLUB'],
     flushing:['BAKERY','MOON DUMPLING','TEA HOUSE','NOODLE SHOP']
   };
-  function paint(place, skylineOnly, night) {
+  function paint(place, skylineOnly, night,season) {
     const canvas = document.createElement('canvas');
     canvas.width = width; canvas.height = height;
     const c = canvas.getContext('2d');
@@ -1125,8 +1125,9 @@ const StreetArt = (() => {
       return canvas;
     }
     if(place==='park'){
-      rect(0,162,640,178,night?'#435846':'#71905e');
-      for(let i=0;i<29;i++){const x=i*23,y=150+(i*19)%25;rect(x,y,5,51,'#64533e');c.fillStyle=night?'#384c43':['#688659','#537b57','#7d965e'][i%3];c.beginPath();c.arc(x,y,17+i%6,0,7);c.fill();}
+      const turf={Spring:'#86a775',Summer:'#70905a',Autumn:'#a29b6b',Winter:'#dbe3dc'},leaves={Spring:['#82a874','#739961','#a4b588'],Summer:['#688659','#537b57','#7d965e'],Autumn:['#ae7148','#c49551','#99694e'],Winter:['#84958d','#a3aaa1','#899f94']};
+      rect(0,162,640,178,night?'#435846':turf[season]||'#71905e');
+      for(let i=0;i<29;i++){const x=i*23,y=150+(i*19)%25;rect(x,y,5,51,'#64533e');c.fillStyle=night?'#384c43':(leaves[season]||leaves.Summer)[i%3];c.beginPath();c.arc(x,y,17+i%6,0,7);c.fill();}
       poly([[0,290],[235,243],[395,210],[484,205],[317,245],[640,297],[640,325],[259,260],[0,320]],night?'#746e64':'#c7ae8b');
       for(const x of [70,420]){rect(x,226,52,7,'#80624a');rect(x,219,52,4,'#84674b');rect(x+4,232,3,10,ink);rect(x+45,232,3,10,ink);}
       rect(265,211,92,26,'#335644');label('LONG MEADOW',311,227,10,cream);return canvas;
@@ -1205,9 +1206,9 @@ const StreetArt = (() => {
     return canvas;
   }
   return {
-    scene(place, skylineOnly=false, night=false) {
-      const key=[place,skylineOnly,night].join('/');
-      if(!cache.has(key))cache.set(key,paint(place,skylineOnly,night));
+    scene(place, skylineOnly=false, night=false,season='Spring') {
+      const key=[place,skylineOnly,night,season].join('/');
+      if(!cache.has(key))cache.set(key,paint(place,skylineOnly,night,season));
       return cache.get(key);
     }
   };
@@ -1560,7 +1561,9 @@ const BoroughLife=(()=>{
       c.offer={from:me,to:a.other,task:a.task};b.couples[key]=c;return;
     }
     if(!offer||offer.to!==me||offer.from!==a.other)throw Error('Only the invited roommate can accept.');
-    const task=offer.task,rule=proposals[task];delete c.offer;c.points=Math.min(100,c.points+rule.points);
+    const task=offer.task,rule=proposals[task];
+    if((p.place||'home')==='home'){h.goNear(w,p,q.x,q.y,{kind:'pose'});}
+    p.gesture=q.gesture={type:task,until:Date.now()+9000};delete c.offer;c.points=Math.min(100,c.points+rule.points);
     if(['date','engage','marry'].includes(task))c.stage++;
     if(task==='baby')c.pregnancy={carrier:offer.from,due:w.day+3};
     const event={flirt:'flirted',kiss:'shared a kiss',cuddle:'cuddled',date:'started dating',engage:'got engaged',marry:'got married',baby:'are expecting a baby'}[task];
@@ -1682,6 +1685,7 @@ function cityPanel(me) {
   const {stops,stamps,visits,fare,bonus}=state.city;
   const atHome=me.place==='home';
   $('placeTitle').textContent=atHome?(state.borough?BoroughLife.deeds[state.borough.deed].name:'Bed-Stuy walk-up'):stops[me.place].venue;
+  $('rideHome').textContent=state.borough?.deed?'Return home · Free':'Return to Bed-Stuy · Free';
   $('placeBorough').textContent=atHome?(state.borough?BoroughLife.deeds[state.borough.deed].borough:'Brooklyn'):stops[me.place].name+' / '+stops[me.place].borough;
   $('sceneTransit').textContent=atHome?'↗ Catch the subway':'↗ Neighborhood guide';
   document.querySelector('.zoom').hidden=!atHome;
@@ -1714,7 +1718,7 @@ function cityPanel(me) {
   $('rideHome').hidden=atHome;
 }
 function streetView(me,night) {
-  const pic=StreetArt.scene(me.place,false,night);
+  const pic=StreetArt.scene(me.place,false,night,state.borough?.weather.season);
   const scale=Math.max(W/pic.width,H/pic.height);
   const x=(W-pic.width*scale)/2, y=(H-pic.height*scale)/2;
   ctx.imageSmoothingEnabled=false;ctx.drawImage(pic,x,y,pic.width*scale,pic.height*scale);
@@ -1731,7 +1735,7 @@ function streetView(me,night) {
     ctx.font='bold 12px system-ui';ctx.textAlign='center';const size=ctx.measureText(p.name).width;
     ctx.fillStyle='#202b39';ctx.fillRect(px-size/2-5,py-33*k-14,size+10,16);
     ctx.fillStyle='#fff4d6';ctx.fillText(p.name,px,py-33*k-2);
-    PetRoom.streetDog(p,px,py,k);
+    BoroughUI.gesture(p,px+9*k,py-33*k);PetRoom.streetDog(p,px,py,k);
     hit.push({type:'player',p,cx:px,cy:py-16*k,rx:13*k,ry:22*k});
   });
 }
@@ -1739,6 +1743,13 @@ function streetView(me,night) {
 const stillStreets=matchMedia('(prefers-reduced-motion: reduce)');
 function drawStreetMotion(x,y,scale,night) {
   const time=stillStreets.matches?7:performance.now()/1000;
+  if(state.borough?.car&&currentResident().place!=='park'){
+    const xx=x+scale*240,yy=y+scale*300;
+    ctx.save();ctx.translate(xx,yy);ctx.scale(scale,scale);
+    ctx.fillStyle='#385a58';ctx.beginPath();ctx.moveTo(-30,0);ctx.lineTo(-26,-8);ctx.lineTo(-15,-11);ctx.lineTo(-8,-20);ctx.lineTo(9,-20);ctx.lineTo(20,-10);ctx.lineTo(29,-7);ctx.lineTo(30,1);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#a8cdca';ctx.fillRect(-8,-17,8,6);ctx.fillRect(2,-17,7,6);
+    for(const wheel of [-18,17]){ctx.fillStyle='#313a3c';ctx.beginPath();ctx.arc(wheel,0,5,0,7);ctx.fill();}ctx.restore();
+  }
   const bikeX=((time*17)%710)-35, roadY=292;
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   ctx.lineWidth=1.5;ctx.strokeStyle='#293d46';
@@ -1869,6 +1880,11 @@ const BoroughUI=(()=>{
       buttons(root,r.name+((r.min||0)>c.points?' · '+r.min+' romance':''),()=>choose(key),(r.min||0)>c.points||key==='baby'&&!!c.pregnancy);
     }
   }
+  function gesture(p,x,y){
+    if(!p.gesture||p.gesture.until<Date.now())return;
+    ctx.save();ctx.translate(x,y-(stillStreets.matches?0:Math.sin(performance.now()/320)*2));
+    ctx.fillStyle='#b85e76';ctx.beginPath();ctx.moveTo(0,4);ctx.bezierCurveTo(-11,-2,-5,-9,0,-3);ctx.bezierCurveTo(5,-9,11,-2,0,4);ctx.fill();ctx.restore();
+  }
   function atmosphere(){
     const f=state.borough?.weather;if(!f)return;
     const wet=/rain|drizzle/i.test(f.weather),snow=/snow|flurries/i.test(f.weather);
@@ -1893,7 +1909,7 @@ const BoroughUI=(()=>{
     });
   }
   window.addEventListener('DOMContentLoaded',()=>{$('childForm').onsubmit=async e=>{e.preventDefault();if(await action({kind:'child',task:'name',name:$('childName').value,id:$('childForm').dataset.child}))$('childDialog').close();};$('childCancel').onclick=()=>$('childDialog').close();});
-  return {render,social,vehicle,atmosphere,familyAtHome};
+  return {render,social,vehicle,atmosphere,familyAtHome,gesture};
 })();
 </script><script>'use strict';
 const SoloDays=(()=>{
@@ -1918,7 +1934,7 @@ const SoloDays=(()=>{
         try{write(session,'-tasks',[...read(session,'-tasks',[]).filter(e=>e.date>=today()-30),{date:today(),task,pending:true}]);draw();}catch{notice('This device could not save your practice.');}};
       panel.append(b);
     }
-    const n=records.filter(e=>e.pending).length;if(n)panel.append(el('small',n+' activities saved on this device'));
+    const n=records.filter(e=>e.pending).length;if(n)panel.append(el('small',n+(n===1?' activity':' activities')+' saved on this device'));
   }
   function status(flag){
     flag=Boolean(flag&&session?.peer&&state?.borough);
@@ -2105,7 +2121,7 @@ function character(p){
   ctx.save();ctx.translate(a,top);const k=S*1.49/216;ctx.scale(k,k);ctx.translate(0,-216);
   WardrobeArt.resident(ctx,p.appearance,p.color,stride*48);
   ctx.restore();
-  const b=top-S*1.50;
+  const b=top-S*1.50;BoroughUI.gesture(p,a+S*.25,b);
   if(p.id===state.me){ctx.beginPath();ctx.fillStyle='#387f67';ctx.moveTo(a-3,b-5);ctx.lineTo(a+3,b-5);ctx.lineTo(a,b-1);ctx.closePath();ctx.fill();}
   ctx.font='600 '+Math.max(10,Math.min(14,S*.28))+'px system-ui';const label=p.name+(p.online?'':' · away'),width=ctx.measureText(label).width;
   ctx.fillStyle='#f9fcf4e8';ctx.fillRect(a-width/2-5,b-22,width+10,16);ctx.fillStyle='#354d46';ctx.textAlign='center';ctx.fillText(label,a,b-10);
