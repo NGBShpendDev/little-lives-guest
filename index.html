@@ -897,6 +897,10 @@ function walkupDetails(night) {
 
 const FurnitureThumbnails = new Map();
 function furniturePreview(type,color) {
+  if(World3D.active){
+    const image=document.createElement('img');image.width=44;image.height=38;image.alt='';
+    World3D.thumbnail(type,color,image);return image;
+  }
   const key=type+'/'+color;
   if(!FurnitureThumbnails.has(key)) {
     const thumb=document.createElement('canvas');thumb.width=88;thumb.height=76;
@@ -910,7 +914,7 @@ function furniturePreview(type,color) {
     FurnitureThumbnails.set(key,thumb.toDataURL());
   }
   const image=document.createElement('img');image.src=FurnitureThumbnails.get(key);image.alt='';
-  image.width=44;image.height=38;World3D.thumbnail(type,color,image);return image;
+  image.width=44;image.height=38;return image;
 }
 
 let roomBackdrop,backdropKey='',floorState,floorKey='';
@@ -2538,7 +2542,7 @@ const World3D=(()=>{
       const device=debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):'';
       lowPower=/swiftshader|llvmpipe|software rasterizer/i.test(device);
       if(lowPower)sun.shadow.mapSize.set(384,384);
-      renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+      renderer.shadowMap.enabled=true;renderer.shadowMap.autoUpdate=!lowPower;renderer.shadowMap.needsUpdate=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
       renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
       // A studio window panorama gives glass, metal and wet surfaces a roughness-filtered reflection.
       const c=document.createElement('canvas');c.width=512;c.height=256;const g=c.getContext('2d');
@@ -2623,6 +2627,7 @@ const World3D=(()=>{
       test(new T.Box3(new T.Vector3(pos.x-.22*sz.x,pos.y,pos.z-.18),new T.Vector3(pos.x+.22*sz.x,pos.y+1.73*sz.y,pos.z+.18)),{type:'player',p:r.p});}
     return result;
   }
+  const simpleMaterials=new Map();
   function rebuild(s,me,n){
     const home=me.place==='home',camX=Math.sin(yaw),camZ=Math.cos(yaw);
     if(layoutState!==s){layoutState=s;layoutSignature=JSON.stringify([s.code,s.objects.map(o=>[o.id,o.t,o.x,o.y,o.rotation,o.color]),s.edges,s.floors,s.borough?.deed,s.borough?.wallpaper,s.borough?.weather.season,s.borough?.car]);}
@@ -2636,6 +2641,15 @@ const World3D=(()=>{
       }
     }else Lot3D.city(draft,me.place,s);
     world=batch(draft);scene.add(world);
+    if(lowPower){
+      for(const part of world.children){
+        const mat=part.material;
+        if(mat.metalness>.15||mat.transparent||mat.emissive?.getHex()||mat.map?.image===ModelKit.material('#989ca1','road').map.image)continue;
+        if(!simpleMaterials.has(mat))simpleMaterials.set(mat,new T.MeshLambertMaterial({color:mat.color,map:mat.map,side:mat.side,vertexColors:mat.vertexColors}));
+        part.material=simpleMaterials.get(mat);
+      }
+      renderer.shadowMap.needsUpdate=true;
+    }
   }
   let reflection,reflectionCam,reflectAt=0,reflectKey='';
   const reflectionMatrix={value:new T.Matrix4()},reflectionMap={value:null},strength={value:0};
@@ -2745,10 +2759,21 @@ const World3D=(()=>{
     precipitation.attributes.position.needsUpdate=true;
   }
   const hoverTile=box(scene,0,.059,0,.97,.016,.97,'#87bcb1');hoverTile.visible=false;hoverTile.castShadow=false;
+  let slowFrames=0,frameKey='',lastPaint=0,lastMotion='',animateUntil=0;
+  function needsFrame(s,me,w,h,now){
+    if(!lowPower)return true;
+    const motion=JSON.stringify(s.players.map(p=>[p.id,p.x,p.y,p.place]));
+    if(motion!==lastMotion){lastMotion=motion;animateUntil=now+720;}
+    const key=JSON.stringify([s.code,me.place,w,h,zoom,yaw,elev,panX,panY,mode,wallsTall,hover,
+      layoutSignature,s.players.map(p=>[p.id,p.online,p.appearance,p.gesture?.verb]),s.pets,s.borough?.children,s.borough?.weather,Math.floor(s.clock/10),RoomMaterials.revision]);
+    const paint=key!==frameKey||now<animateUntil||now-lastPaint>3500;
+    frameKey=key;if(paint)lastPaint=now;return paint;
+  }
   function draw(s,me,w,h,n,now){
     if(!init()||failed){active=false;return false;}
     try{
-      const dt=Math.min(.1,(now-lastFrame)/1000||.03);lastFrame=now;
+      if(active&&!needsFrame(s,me,w,h,now))return true;
+      const dt=Math.min(.25,(now-lastFrame)/1000||.03);lastFrame=now;
       if(lastPlace!==me.place){for(const r of rigs.values())release(r.rig.root);rigs.clear();lastPlace=me.place;}
       camera(w,h,n,me.place==='home');rebuild(s,me,n);lighting(s,n);
       const t=stillStreets.matches?0:now/1000,labels=people(s,me,t,dt);
@@ -2762,6 +2787,10 @@ const World3D=(()=>{
         ctx.fillStyle=p.id===s.me?'#fff9ed':'#294944';ctx.fillText(name,pt.x,pt.y-6);BoroughUI.gesture(p,pt.x+mw/2+3,pt.y-9);ctx.restore();
       }
       if(me.place!=='home'&&s.borough?.weather?.weather==='Breezy')BoroughUI.atmosphere();
+      if(!lowPower){
+        slowFrames=performance.now()-now>280?slowFrames+1:0;
+        if(slowFrames>=3){lowPower=true;previousKey='';renderer.shadowMap.autoUpdate=false;}
+      }
       active=true;canvas.dataset.renderer='webgl';return true;
     }catch(error){console.error('3D scene:',error);failed=true;active=false;return false;}
   }
@@ -2790,7 +2819,7 @@ async function login(kind){if(kind==='join'&&$('join').disabled)return;$('loginE
 if(kind==='join'&&(location.protocol==='file:'||guestLobby)&&!peerCode)throw Error('Paste the NYC invite from your host’s local game.');
 if(peerCode){$('join').disabled=true;$('join').textContent='Connecting to apartment…';a=await LocalRoom.enter(peerCode,{name,color:look.color||0,appearance:look});}
 else if(kind==='restore'){let [code,token]=$('recover').value.trim().split(':');a={code,token,...await api('state',{code,token})}}else a=await api(kind==='solo'?'create':kind,{solo:kind==='solo',name,color:look.color||0,appearance:look,world:$('world').value,code:$('code').value});session={code:a.code,token:a.token,solo:kind==='solo',peer:peerCode||undefined};store();if(session.solo){localStorage.setItem('little-lives-last-solo',JSON.stringify(session));$('continueSolo').hidden=false;}if(invitedWorld)history.replaceState(null,'',location.pathname+location.search);openGame(a.state)}catch(e){$('loginError').textContent=e.message}finally{if(kind==='join'){$('join').disabled=false;$('join').textContent='Join apartment';}}}$('solo').onclick=()=>login('solo');$('create').onclick=()=>login('create');$('join').onclick=()=>login('join');$('restore').onclick=()=>login('restore');
-function openGame(s){$('invite').hidden=Boolean(session.peer);if(session.solo&&localStorage.getItem(LocalRoom.hostKey(session.code)))LocalRoom.start(session).catch(()=>{});citySignature='';epoch++;state=s;SoloDays.status(false);SoloDays.cache(session,state);lastChat=lastHouse=lastNeeds=lastLife='';editLook={...s.players.find(p=>p.id===s.me).appearance};appearanceUI('editAppearance',editLook);vis.clear();$('landing').hidden=true;$('game').hidden=false;renderUI();setMode('live');World3D.reset();zoom=1;panX=panY=0;resize();$('connection').textContent=(session.solo?(LocalRoom.code?'● Hosting · device save':'● Device save'):session.peer?'● Visiting · host saves':'● Connected · autosave')}$('leave').onclick=()=>{epoch++;LocalRoom.stopHosting();LocalRoom.endGuest();session=null;state=null;try{localStorage.removeItem('little-lives-session')}catch{}$('game').hidden=true;$('landing').hidden=false};
+function openGame(s){$('invite').hidden=Boolean(session.peer);if(session.solo&&localStorage.getItem(LocalRoom.hostKey(session.code)))LocalRoom.start(session).catch(()=>{});citySignature='';epoch++;state=s;SoloDays.status(false);SoloDays.cache(session,state);lastChat=lastHouse=lastNeeds=lastLife='';editLook={...s.players.find(p=>p.id===s.me).appearance};vis.clear();$('landing').hidden=true;$('game').hidden=false;window.scrollTo(0,0);renderUI();setMode('live');World3D.reset();zoom=1;panX=panY=0;resize();$('connection').textContent=(session.solo?(LocalRoom.code?'● Hosting · device save':'● Device save'):session.peer?'● Visiting · host saves':'● Connected · autosave')}$('leave').onclick=()=>{epoch++;LocalRoom.stopHosting();LocalRoom.endGuest();session=null;state=null;try{localStorage.removeItem('little-lives-session')}catch{}$('game').hidden=true;$('landing').hidden=false};
 async function poll(){if(!session||requesting)return;requesting=true;let e=epoch;try{let r=await api('state',session);if(e!==epoch)return;state=r.state;SoloDays.status(false);SoloDays.cache(session,state);await SoloDays.sync(session);if(e!==epoch)return;$('connection').textContent=(session.solo?(LocalRoom.code?'● Hosting · device save':'● Device save'):session.peer?'● Visiting · host saves':'● Connected · autosave');renderUI()}catch(err){if(e===epoch)SoloDays.status(true);if(e===epoch)$('connection').textContent=session?.peer?'○ Waiting for host…':'○ Reconnecting…'}finally{requesting=false}}async function schedulePoll(){
   if(!document.hidden||LocalRoom.code)await poll();
   setTimeout(schedulePoll,state?.pollMs||650);
