@@ -1063,7 +1063,7 @@ const PetRoom=(()=>{
     const spec=PetLife.species[chosen],cost=total(),b=$('adoptPet');
     b.textContent='Adopt '+spec.title.toLowerCase()+' · $'+cost;
     const me=currentResident();b.disabled=pending||me.place!=='home'||!!me.workingUntil||state.money<cost;
-    $('adoptionNote').textContent=me.place!=='home'?'Return to your apartment to adopt.':me.workingUntil?'Adoptions open after your shift.':state.money<cost?'You need $'+(cost-state.money)+' more in household funds.':$('petHabitat').value==='new'?'Includes a '+spec.habitat.toLowerCase()+'. Move it in Build.':chosen==='fish'?'Up to three fish share this aquarium.':'This pet will move into the selected habitat.';
+    $('adoptionNote').textContent=me.place!=='home'?'Return to your apartment to adopt.':me.workingUntil?'Adoptions open after your shift.':state.money<cost?'You need $'+(cost-state.money)+' more in household funds.':$('petHabitat').value==='new'?'Your '+spec.habitat.toLowerCase()+' comes with adoption. Move it in Build.':chosen==='fish'?'Up to three fish share this aquarium.':'This pet will move into the selected habitat.';
   }
   function adoption(me){
     const spec=PetLife.species[chosen],available=habitats(spec);
